@@ -32,9 +32,9 @@ class Network(object):
         ever used in computing the outputs from later layers."""
         self.num_layers = len(sizes)
         self.sizes = sizes
-        self.trainingError=[]
-        self.validationError=[]
-        self.testError=[]
+        self.trainingError=[None]
+        self.validationError=[None]
+        self.testError=[None]
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
@@ -47,22 +47,23 @@ class Network(object):
         return a
 
     def plot(self,error1, error2, error3):
-        line1,=plt.plot(error1,"b-",label='training error')
-        line2,=plt.plot(error2,"r-", label='testing error')
-        if(error3!=None):
-            line3,=plt.plot(error3, "g-", label="validation error")
+        line1,=plt.plot(error1,'bo',label='training error')
+        line2,=plt.plot(error2,'ro', label='testing error')
+        line3,=plt.plot(error3, 'go', label="validation error")
 
-        plt.xlabel("# of iterations")
-        plt.ylabel("error rate")
+        plt.xlabel("# of Epochs")
+        plt.ylabel("Rate of Accuracy")
+        plt.xticks(np.arange(0, len(error1), 1.0))
 
-        plt.legend()
-        plt.show()
+        plt.legend(loc= 'lower right')
+        #plt.show()
+        plt.savefig('Current_Experiment_Output.png')
 
     def SGD(self, training_data,training_check, validation_data, epochs, mini_batch_size, eta,
             test_data=None):
-        self.testError=[]
-        self.validationError=[]
-        self.testError=[]
+        self.testError=[None]
+        self.validationError=[None]
+        self.testError=[None]
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
         ``(x, y)`` representing the training inputs and the desired
