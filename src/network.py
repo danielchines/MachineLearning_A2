@@ -41,7 +41,7 @@ class Network(object):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
+    def SGD(self, training_data,training_check, validation_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
@@ -52,6 +52,8 @@ class Network(object):
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
         if test_data: n_test = len(test_data)
+        if validation_data: n_validation = len(validation_data)
+        if training_check: n_train = len(training_check)
         n = len(training_data)
         for j in xrange(epochs):
             random.shuffle(training_data)
@@ -61,8 +63,14 @@ class Network(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data:
-                print "Epoch {0}: {1} / {2}".format(
+                print "Epoch {0}: {1} / {2} Test".format(
                     j, self.evaluate(test_data), n_test)
+            if validation_data:
+                print "Epoch {0}: {1} / {2} Validation".format(
+                    j, self.evaluate(validation_data), n_validation)
+            if training_check:
+                print "Epoch {0}: {1} / {2} Training".format(
+                    j, self.evaluate(training_check), n_train)
             else:
                 print "Epoch {0} complete".format(j)
 
