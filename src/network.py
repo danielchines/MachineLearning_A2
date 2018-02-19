@@ -12,6 +12,7 @@ and omits many desirable features.
 #### Libraries
 # Standard library
 import random
+from matplotlib import pyplot as plt
 
 # Third-party libraries
 import numpy as np
@@ -31,9 +32,13 @@ class Network(object):
         ever used in computing the outputs from later layers."""
         self.num_layers = len(sizes)
         self.sizes = sizes
+        self.trainingError=[]
+        self.validationError=[]
+        self.testError=[]
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
+
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
@@ -41,8 +46,23 @@ class Network(object):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
+    def plot(self,error1, error2, error3):
+        line1,=plt.plot(error1,"b-",label='training error')
+        line2,=plt.plot(error2,"r-", label='testing error')
+        if(error3!=None):
+            line3,=plt.plot(error3, "g-", label="validation error")
+
+        plt.xlabel("# of iterations")
+        plt.ylabel("error rate")
+
+        plt.legend()
+        plt.show()
+
     def SGD(self, training_data,training_check, validation_data, epochs, mini_batch_size, eta,
             test_data=None):
+        self.testError=[]
+        self.validationError=[]
+        self.testError=[]
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
         ``(x, y)`` representing the training inputs and the desired
@@ -62,17 +82,25 @@ class Network(object):
                 for k in xrange(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
+
             if test_data:
+                self.testError.append(self.evaluate(test_data)/float(n_test))
                 print "Epoch {0}: {1} / {2} Test".format(
                     j, self.evaluate(test_data), n_test)
             if validation_data:
+                self.validationError.append(self.evaluate(validation_data)/float(n_validation))
                 print "Epoch {0}: {1} / {2} Validation".format(
                     j, self.evaluate(validation_data), n_validation)
             if training_check:
+                self.trainingError.append(self.evaluate(training_check)/float(n_train))
                 print "Epoch {0}: {1} / {2} Training".format(
                     j, self.evaluate(training_check), n_train)
             else:
                 print "Epoch {0} complete".format(j)
+
+        self.plot(self.testError, self.trainingError, self.validationError)
+
+
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
